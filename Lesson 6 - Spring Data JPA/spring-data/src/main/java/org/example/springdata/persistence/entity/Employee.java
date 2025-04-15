@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "employee")
@@ -14,7 +14,12 @@ import java.util.Set;
 public class Employee {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "employee_id_seq")
+    @SequenceGenerator(
+            name = "employee_id_seq",
+            sequenceName = "employee_id_seq",
+            allocationSize = 50
+    )
     private Long id;
 
     @Column(name = "first_name", nullable = false)
@@ -26,7 +31,7 @@ public class Employee {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "company_id")
     private Company company;
 
@@ -38,6 +43,15 @@ public class Employee {
     )
     private Set<Project> projects;*/
 
-    @OneToMany(mappedBy = "employee")
-    private List<EmployeeProject> projects;
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.PERSIST)
+    private List<EmployeeProject> projects = new ArrayList<>();
+
+    public void addEmployeeProject(Project project) {
+        EmployeeProject employeeProject = new EmployeeProject();
+        employeeProject.setProject(project);
+        employeeProject.setEmployee(this);
+
+        projects.add(employeeProject);
+        project.getEmployeeProjects().add(employeeProject);
+    }
 }

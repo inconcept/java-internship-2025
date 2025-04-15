@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.example.springdata.enums.ProjectStatus;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "project")
@@ -15,7 +15,12 @@ import java.util.Set;
 public class Project {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "project_id_seq")
+    @SequenceGenerator(
+            name = "project_id_seq",
+            sequenceName = "project_id_seq",
+            allocationSize = 50
+    )
     private Long id;
 
     @Column(name = "name", nullable = false)
@@ -32,5 +37,5 @@ public class Project {
     private Set<Employee> employees;*/
 
     @OneToMany(mappedBy = "project")
-    private List<EmployeeProject> projects;
+    private List<EmployeeProject> employeeProjects = new ArrayList<>();
 }
